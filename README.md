@@ -1,5 +1,5 @@
 # dohko-common-starter
->将与业务无关的常用功能封装成spring-boot-starter
+>将与业务无关的常用功能(如：日志、缓存、分布式锁等横切功能点)封装成spring-boot-starter
 
 
 <br>
