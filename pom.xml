@@ -23,6 +23,13 @@
     <description>通用spring-boot-starter</description>
 
 
+
+    <modules>
+        <module>dohko-log-spring-boot-starter</module>
+        <module>dohko-cache-spring-boot-starter</module>
+    </modules>
+
+
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

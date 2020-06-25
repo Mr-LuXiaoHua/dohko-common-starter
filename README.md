@@ -61,5 +61,66 @@
 ```
  
 
+<br>
+<br>
+
+## dohko-cache-spring-boot-starter
+缓存starter，目前只实现了redis, 支持spring-cache，默认缓存时间30分钟。 后续会逐步实现memcache
+
+### 使用说明
+* 使用 `mvn install` 将项目安装到本地仓库
+
+* 在项目中引入dohko-cache-spring-boot-starter
+```
+<dependency>
+     <groupId>com.dohko</groupId>
+     <artifactId>dohko-cache-spring-boot-starter</artifactId>
+     <version>0.0.1-SNAPSHOT</version>
+ </dependency>
+ ```
+ 
+* 启动类增加starter项目的包扫描 `com.dohko`
+```
+@SpringBootApplication
+@ComponentScan(basePackages={"com.example", "com.dohko"})
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
+* application.properties配置redis
+```
+spring.redis.host=localhost
+spring.redis.port=6379
+spring.redis.password=123456
+
+spring.redis.lettuce.pool.max-active=10
+spring.redis.lettuce.pool.max-wait=10000
+```
+
+* 代码中可以使用spring-cache风格
+```
+ @Cacheable(cacheNames = "hello", key = "#name")
+    public String hello(String name) {
+        System.out.println("模拟业务处理");
+        return name;
+    }
+```
+
+* 直接获取RedisTemplate，灵活进行redis操作
+```
+@Autowired
+private CacheProvider cacheProvider;
 
 
+ RedisTemplate<String, String> redisTemplate = cacheProvider.getRedisTemplate();
+         
+ String key = "test";
+ redisTemplate.opsForValue().set(key, name);
+ String value =  redisTemplate.opsForValue().get(key);
+ 
+```
