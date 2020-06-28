@@ -124,3 +124,105 @@ private CacheProvider cacheProvider;
  String value =  redisTemplate.opsForValue().get(key);
  
 ```
+
+
+<br>
+<br>
+
+## dohko-lock-redisson-spring-boot-starter
+分布式锁starter，基于redission
+
+### 使用说明
+* 使用 `mvn install` 将项目安装到本地仓库
+
+* 在项目中引入dohko-lock-redisson-spring-boot-starter
+```
+<dependency>
+    <groupId>com.dohko</groupId>
+    <artifactId>dohko-lock-reddisson-spring-boot-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+ ```
+ 
+* 启动类启用分布式锁
+```
+@EnableLock
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
+* application.properties配置redis
+```
+# 单个redis服务器
+dohko.redisson.cluster-type=single
+dohko.redisson.db=0
+dohko.redisson.password=
+dohko.redisson.address=redis://127.0.0.1:6379
+dohko.redisson.connect-timeout=10000
+dohko.redisson.connection-pool-size=64
+
+
+# redis-集群-哨兵模式
+#dohko.redisson.cluster-type=sentinal
+#dohko.redisson.sentinel-master-name=your-sentinel-name
+#dohko.redisson.db=0
+dohko.redisson.password=
+#dohko.redisson.sentinel-nodes=redis://127.0.0.1:6379,redis://127.0.0.1:6389,redis://127.0.0.1:6399
+#dohko.redisson.connect-timeout=10000
+#dohko.redisson.connection-pool-size=64
+
+# redis-集群-cluster模式
+#dohko.redisson.cluster-type=cluster
+dohko.redisson.password=
+#dohko.redisson.cluster-nodes=redis://127.0.0.1:6349,redis://127.0.0.1:6359,redis://127.0.0.1:6369,redis://127.0.0.1:6379,redis://127.0.0.1:6389,redis://127.0.0.1:6399
+#dohko.redisson.connect-timeout=10000
+#dohko.redisson.connection-pool-size=64
+```
+
+* 方式一：使用注解实现分布式锁
+> 分布式锁的key为: module + key, 如orderNo=10086, 则组合后的key为 order-10086
+```
+ @DistributedLock(module = "order-", key="#{#orderNo}")
+ public void testLock2(String orderNo) {
+     try {
+         log.info("模拟业务");
+         Thread.sleep(5000L);
+     } catch (InterruptedException e) {
+         e.printStackTrace();
+     }
+ }
+```
+
+* 方式二：获取DistributedLockService，灵活操作分布式锁
+```
+ @Autowired
+ private DistributedLockService distributedLockService;
+
+
+  public void testLock1(OrderDTO dto) {
+     log.info("进入方法了");
+     RLock lock = distributedLockService.getLock(dto.getOrderNo());
+     try {
+         boolean isLock = lock.tryLock(0, 10L, TimeUnit.SECONDS);
+         if (isLock) {
+             // 获取到锁
+
+         } else {
+             // 没有获取到锁
+         }
+     } catch (Exception e) {
+         e.printStackTrace();
+     } finally {
+         if (Objects.nonNull(lock) && lock.isHeldByCurrentThread()) {
+             lock.unlock();
+         }
+     }
+ }
+ 
+```

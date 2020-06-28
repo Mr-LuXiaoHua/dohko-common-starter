@@ -27,6 +27,8 @@
     <modules>
         <module>dohko-log-spring-boot-starter</module>
         <module>dohko-cache-spring-boot-starter</module>
+        <module>dohko-lock-redisson-spring-boot-starter</module>
+        <module>dohko-starter-example</module>
     </modules>
 
 

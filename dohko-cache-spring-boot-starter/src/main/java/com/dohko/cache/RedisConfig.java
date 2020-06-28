@@ -62,8 +62,10 @@ public class RedisConfig extends CachingConfigurerSupport {
         redisCacheConfiguration = redisCacheConfiguration.entryTtl(Duration.ofMinutes(30L))
                 //如果是空值，不缓存
                 .disableCachingNullValues()
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer()))         //设置key序列化器
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer((valueSerializer())));  //设置value序列化器
+                //设置key序列化器
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer()))
+                //设置value序列化器
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer((valueSerializer())));
 
         return RedisCacheManager
                 .builder(RedisCacheWriter.nonLockingRedisCacheWriter(lettuceConnectionFactory))
