@@ -1,12 +1,16 @@
 package com.dohko.log.aspect;
 
 import com.dohko.log.util.RequestUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,9 +66,18 @@ public class CallLogAspect {
      */
     private void logInputParam(JoinPoint joinPoint) {
 
-
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String method = joinPoint.getSignature().getName();
+
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = Objects.requireNonNull(attributes).getRequest();
+        // 获取请求uri
+        String uri = request.getRequestURI();
+        // 获取请求ip
+        String ip = RequestUtils.getIpAddr(request);
+
+        log.info("调用方法: {}.{}, 请求来源: {}, 请求URI: {}", className, method, ip, uri);
+
 
         // 获取参数名称
         String[] argNames = ((MethodSignature)joinPoint.getSignature()).getParameterNames();
@@ -73,25 +86,13 @@ public class CallLogAspect {
         } else {
 
             Map<String, Object> paramsMap = new HashMap<>(16);
-
-
             Object[] args = joinPoint.getArgs();
+
             for (int i=0; i<argNames.length; i++) {
                 Object arg = args[i];
                 if (arg instanceof HttpServletRequest) {
-                    HttpServletRequest request = (HttpServletRequest) arg;
                     Map<String, String> params = RequestUtils.getParams(request);
                     paramsMap.put(argNames[i], params);
-
-                    // 获取请求uri
-                    String uri = request.getRequestURI();
-
-                    // 获取请求ip
-                    String ip = RequestUtils.getIpAddr(request);
-
-                    log.info("调用方法: {}.{}, 请求来源: {}, 请求URI: {}", className, method, ip, uri);
-
-
                 } else if (arg instanceof HttpServletResponse) {
                     continue;
                 } else {
@@ -99,10 +100,14 @@ public class CallLogAspect {
                 }
             }
 
-            log.info("调用方法: {}.{}, 方法参数: {}", className, method, paramsMap);
-        }
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                log.info("调用方法: {}.{}, 方法参数: {}", className, method, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(paramsMap));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
 
-
+          }
 
     }
 
