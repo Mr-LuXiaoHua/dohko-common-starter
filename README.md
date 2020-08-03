@@ -53,11 +53,11 @@
  
  * 效果展示： /test?userId=123456
  ```
-   LOG-ID: 60258630 -> 调用方法: TestController.user, 请求来源: 192.168.251.44, 请求URI: /test
-   LOG-ID: 60258630 -> 调用方法: TestController.user, 方法参数: {request={userId=123456}}
+   调用方法: TestController.user, 请求来源: 192.168.251.44, 请求URI: /test
+   调用方法: TestController.user, 方法参数: {request={userId=123456}}
    ---模拟业务处理---
-   LOG-ID: 60258630 -> 调用方法:TestController.user  耗时: 7 ms
-   LOG-ID: 60258630 -> 调用方法: TestController.user, 方法响应: User(userId=123456, username=楚留香)
+   调用方法:TestController.user  耗时: 7 ms
+   调用方法: TestController.user, 方法响应: User(userId=123456, username=楚留香)
 ```
  
 
@@ -104,11 +104,11 @@ spring.redis.lettuce.pool.max-wait=10000
 
 * 代码中可以使用spring-cache风格
 ```
- @Cacheable(cacheNames = "hello", key = "#name")
-    public String hello(String name) {
-        System.out.println("模拟业务处理");
-        return name;
-    }
+@Cacheable(cacheNames = "hello", key = "#name")
+public String hello(String name) {
+    System.out.println("模拟业务处理");
+    return name;
+}
 ```
 
 * 直接获取RedisTemplate，灵活进行redis操作

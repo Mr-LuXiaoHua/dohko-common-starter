@@ -2,6 +2,7 @@ package com.dohko.log.annotation;
 
 
 import com.dohko.log.configuration.CallLogImportSelector;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
