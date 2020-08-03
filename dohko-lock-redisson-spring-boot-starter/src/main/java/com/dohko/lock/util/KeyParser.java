@@ -24,7 +24,7 @@ public class KeyParser {
      * @param joinPoint
      * @param module 业务模块
      * @param key   key
-     * @return
+     * @return 返回分布式锁的key
      */
     public static String parse(ProceedingJoinPoint joinPoint, String module, String key) {
         ExpressionParser parser = new SpelExpressionParser();

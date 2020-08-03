@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @description:
+ * @description: 分布式锁切面
  * @author: luxiaohua
  * @date: 2020-06-28 11:26
  */
@@ -29,7 +29,7 @@ public class DistributedLockAspect {
 
 
     @Autowired
-    private DistributedLockService redissonService;
+    private DistributedLockService distributedLockService;
 
 
 
@@ -41,38 +41,36 @@ public class DistributedLockAspect {
         String module = lock.module();
         String key = lock.key();
 
-        int waitTime = lock.waitTime();
-        int leaseTime = lock.leaseTime();
-
-
-        log.info("lock -> module:{}, key:{}, waitTime:{}, leaseTime:{}", module, key, waitTime, leaseTime);
+        long waitTime = lock.waitTime();
+        long leaseTime = lock.leaseTime();
 
         String lockName = KeyParser.parse(joinPoint, module, key);
+        log.info("try to get distributed lock -> lockName:{}, waitTime:{}s, leaseTime:{}s", lockName, waitTime, leaseTime);
 
-        log.info("lockName:{}", lockName);
-
-        RLock rLock = redissonService.getLock(lockName);
+        RLock rLock = distributedLockService.getLock(lockName);
 
         boolean isLock = false;
         try {
             isLock = rLock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+        }
+
+        if (!isLock) {
+            log.warn("try to get distributed lock -> lockName:{} get lock fail.", lockName);
+            throw new LockException("try to get distributed lock is fail.");
         }
 
         if (isLock) {
             try {
                 proceed = joinPoint.proceed();
             } catch (Throwable e){
-
+                log.error(e.getMessage(), e);
             } finally {
                 if (Objects.nonNull(rLock) && rLock.isHeldByCurrentThread()) {
                     rLock.unlock();
                 }
             }
-
-        } else {
-            throw new LockException("获取锁失败");
         }
 
         return proceed;

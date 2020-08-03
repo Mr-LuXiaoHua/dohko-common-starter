@@ -9,10 +9,10 @@
     </parent>
 
     <groupId>com.dohko</groupId>
-    <artifactId>dohko-lock-reddisson-spring-boot-starter</artifactId>
+    <artifactId>dohko-lock-redisson-spring-boot-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>dohko-lock-reddisson-spring-boot-starter</name>
-    <description>redisson实现分布式锁spring-boot-starter</description>
+    <name>dohko-lock-redisson-spring-boot-starter</name>
+    <description>redisson分布式锁 spring-boot-starter</description>
 
 
     <dependencies>

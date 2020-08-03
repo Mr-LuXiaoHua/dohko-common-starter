@@ -33,14 +33,14 @@ public @interface DistributedLock {
      * 尝试获取锁，最多等待时间，默认不等待。单位：秒
      * @return
      */
-    int waitTime() default 0;
+    long waitTime() default 0;
 
 
     /**
      * 上锁成功后最长持有时间，单位秒。默认10秒
      * @return
      */
-    int leaseTime() default 10;
+    long leaseTime() default 10;
 
 
 }
