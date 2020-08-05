@@ -14,4 +14,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CallLog {
 
+
+    /**
+     * 是否打印响应日志，true-打印；false-不打印
+     * @return
+     */
+    boolean isPrintRespLog() default true;
+
+
 }

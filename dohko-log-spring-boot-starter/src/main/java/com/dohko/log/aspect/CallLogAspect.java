@@ -1,5 +1,6 @@
 package com.dohko.log.aspect;
 
+import com.dohko.log.annotation.CallLog;
 import com.dohko.log.util.RequestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -56,7 +58,13 @@ public class CallLogAspect {
 
     @AfterReturning(pointcut = "pointcut()", returning = "result")
     public void afterReturning(JoinPoint point, Object result) {
-        log.info("调用方法: {}.{}, 响应: {}", point.getTarget().getClass().getSimpleName(), point.getSignature().getName(), result);
+
+        MethodSignature sign = (MethodSignature) point.getSignature();
+        Method method = sign.getMethod();
+        CallLog callLog = method.getAnnotation(CallLog.class);
+        if (callLog.isPrintRespLog()) {
+            log.info("调用方法: {}.{}, 响应: {}", point.getTarget().getClass().getSimpleName(), point.getSignature().getName(), result);
+        }
     }
 
 
